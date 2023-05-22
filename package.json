@@ -1,16 +1,25 @@
 {
-  "name": "users-rest",
-  "version": "0.0.0",
-  "private": true,
+  "name": "s.d_back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "build": "npm i"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ALONKIGLER/S.D_Back.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ALONKIGLER/S.D_Back/issues"
+  },
+  "homepage": "https://github.com/ALONKIGLER/S.D_Back#readme",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "express": "~4.16.1",
-    "hbs": "~4.0.4",
-    "http-errors": "~1.6.3",
-    "morgan": "~1.9.1"
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22"
   }
 }
