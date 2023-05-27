@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 
 app.use(cors());
+app.use(express.json());
 
 /**
  * @license
@@ -46,7 +47,7 @@ fs.readFile("credentials.json", (err, content) => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
+function authorize(credentials, callback, data) {
   const { client_secret, client_id, redirect_uris } = credentials.web;
   const oAuth2Client = new google.auth.OAuth2(
     client_id,
@@ -56,9 +57,9 @@ function authorize(credentials, callback) {
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return getNewToken(oAuth2Client, callback);
+    if (err) return getNewToken(oAuth2Client, callback, data);
     oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
+    callback(oAuth2Client, data);
   });
 }
 
@@ -131,35 +132,69 @@ module.exports = {
   listMajors,
 };
 
-function writeData(auth) {
+function writeData(auth, data) {
   const sheets = google.sheets({ version: "v4", auth });
-  let values = [
-    ["Chris", "Male", "1. Freshman", "FL", "Art", "Baseball"],
-    // Potential next row
-  ];
-  const resource = {
-    values,
-  };
-  sheets.spreadsheets.values.append(
-    {
-      spreadsheetId: "15CGr4xJvaP454zvYbjoy9XbEIZJJ6wokGlH9PZNTenA",
-      range: "Sheet1",
-      valueInputOption: "RAW",
-      resource: resource,
-    },
-    (err, result) => {
-      if (err) {
-        // Handle error
-        console.log(err);
-      } else {
-        console.log(
-          "%d cells updated on range: %s",
-          result.data.updates.updatedCells,
-          result.data.updates.updatedRange
-        );
+
+  if (data) {
+    const values = [
+      [
+        data.firstName,
+        data.link,
+        data.year,
+        data.email,
+        data.phone,
+        data.selectedOption,
+      ],
+    ];
+    const resource = {
+      values,
+    };
+    sheets.spreadsheets.values.append(
+      {
+        spreadsheetId: "15CGr4xJvaP454zvYbjoy9XbEIZJJ6wokGlH9PZNTenA",
+        range: "Sheet1",
+        valueInputOption: "RAW",
+        resource: resource,
+      },
+      (err, result) => {
+        if (err) {
+          // Handle error
+          console.log(err);
+        } else {
+          console.log(
+            "%d cells updated on range: %s",
+            result.data.updates.updatedCells,
+            result.data.updates.updatedRange
+          );
+        }
       }
-    }
-  );
+    );
+  } else {
+    const values = [["data.firstName", "data.link"]];
+    const resource = {
+      values,
+    };
+    sheets.spreadsheets.values.append(
+      {
+        spreadsheetId: "15CGr4xJvaP454zvYbjoy9XbEIZJJ6wokGlH9PZNTenA",
+        range: "Sheet1",
+        valueInputOption: "RAW",
+        resource: resource,
+      },
+      (err, result) => {
+        if (err) {
+          // Handle error
+          console.log(err);
+        } else {
+          console.log(
+            "%d cells updated on range: %s",
+            result.data.updates.updatedCells,
+            result.data.updates.updatedRange
+          );
+        }
+      }
+    );
+  }
 }
 
 app.get("/", (req, res) => {
@@ -181,7 +216,7 @@ app.post("/", (req, res) => {
       return;
     }
 
-    authorize(JSON.parse(content), data);
+    authorize(JSON.parse(content), writeData, data);
     res.send("Data write process initiated");
   });
 });
