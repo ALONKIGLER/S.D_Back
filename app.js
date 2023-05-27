@@ -159,13 +159,25 @@ function writeData(auth) {
 }
 
 app.get("/", (req, res) => {
+  res.send("Hello,the service is live 🎉!");
+});
+
+app.post("/", (req, res) => {
+  const data = req.body;
+  console.log(data);
+  if (!data) {
+    res.status(400).send("No data provided");
+    return;
+  }
+
   fs.readFile("credentials.json", (err, content) => {
     if (err) {
       console.log("Error loading client secret file:", err);
-      res.send("Error loading client secret file");
+      res.status(500).send("Error loading client secret file");
       return;
     }
-    authorize(JSON.parse(content), writeData);
+
+    authorize(JSON.parse(content), writeData); // <-- Pass writeData instead of data
     res.send("Data write process initiated");
   });
 });
