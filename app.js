@@ -1,5 +1,8 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+
+app.use(cors());
 
 /**
  * @license
@@ -18,6 +21,7 @@ const app = express();
  * limitations under the License.
  */
 // [START sheets_quickstart]
+
 const fs = require("fs");
 const readline = require("readline");
 const { google } = require("googleapis");
@@ -177,7 +181,7 @@ app.post("/", (req, res) => {
       return;
     }
 
-    authorize(JSON.parse(content), writeData); // <-- Pass writeData instead of data
+    authorize(JSON.parse(content), data);
     res.send("Data write process initiated");
   });
 });
